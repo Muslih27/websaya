@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Dev Quiz - E-Learning</title>
+    <!-- Import Font 'Poppins' -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00e5ff;
+            --secondary: #b000ff;
+            --bg-color: #0b0c10;
+            --text: #ffffff;
+            --card-bg: rgba(31, 40, 51, 0.7);
+            --danger: #ff3366;
+            --success: #00e676;
+            --warning: #ffaa00;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text);
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 255, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            color: transparent;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 26px;
+            margin-top: 0;
+            font-weight: 800;
+        }
+
+        h2 { font-size: 18px; color: var(--primary); font-weight: 600; margin-bottom: 20px; }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #c5c6c7; font-size: 14px;}
+
+        input, select {
+            width: 100%; padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3); color: white; box-sizing: border-box; font-size: 15px;
+            font-family: 'Poppins', sans-serif; transition: 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none; border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+        }
+
+        button {
+            width: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: #fff; border: none; padding: 15px; border-radius: 10px; cursor: pointer;
+            margin-top: 10px; font-weight: 800; font-size: 16px; text-transform: uppercase;
+            transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(176, 0, 255, 0.3); font-family: 'Poppins', sans-serif;
+        }
+
+        button:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 229, 255, 0.5);}
+
+        .btn-wa { background: linear-gradient(90deg, #1ebe57, #128C7E); box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); font-size: 14px;}
+        .btn-wa:hover { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.5); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.1); box-shadow: none; border: 1px solid rgba(255,255,255,0.2);}
+        
+        .btn-danger { background: linear-gradient(90deg, #ff3366, #cc0033); box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3);}
+
+        .hidden { display: none !important; }
+
+        .question-box {
+            background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 12px;
+            border-left: 5px solid var(--primary); margin-bottom: 25px; font-size: 15px; font-weight: 600; line-height: 1.6;
+        }
+
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05); color: var(--text); border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: left; padding: 15px 20px; border-radius: 10px; font-weight: 400; text-transform: none; font-size: 14px;
+        }
+        .option-btn:hover { background: rgba(0, 229, 255, 0.1); border-color: var(--primary); transform: scale(1.02);}
+
+        .progress-container {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 20px 0; overflow: hidden;
+        }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 0.4s ease; }
+
+        #videoContainer {
+            position: fixed; top: 15px; right: 15px; width: 80px; height: 110px;
+            border-radius: 12px; overflow: hidden; border: 2px solid var(--primary);
+            box-shadow: 0 0 15px rgba(0,229,255,0.5); z-index: 100; background: #000;
+        }
+        #webcam { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        .camera-warning { color: var(--warning); font-size: 13px; margin-top: 10px; font-weight: 600;}
+
+        .report-card { background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin: 20px 0; text-align: left; font-size: 14px;}
+        .report-card p { margin: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;}
+        .report-card span { font-weight: 600; color: var(--primary); float: right;}
+        .score-display { text-align: center; font-size: 40px !important; color: var(--primary); font-weight: 800; text-shadow: 0 0 20px rgba(0,229,255,0.5); margin: 20px 0 !important; border:none !important;}
+
+        .feedback-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 1000;
+            display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px);
+        }
+        .feedback-box {
+            background: rgba(20, 25, 35, 0.95); padding: 30px; border-radius: 20px;
+            text-align: center; width: 100%; max-width: 400px; border: 2px solid transparent; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .feedback-box h2 { font-size: 24px; margin-top: 10px; }
+        .feedback-box p { font-size: 14px; line-height: 1.6; color: #dcdde1;}
+        .feedback-icon { font-size: 50px; margin-bottom: -10px; }
+        
+        .anim-correct { border-color: var(--success); box-shadow: 0 0 30px rgba(0, 230, 118, 0.3); animation: popIn 0.5s forwards;}
+        .anim-correct h2 { color: var(--success); }
+        .anim-wrong { border-color: var(--danger); box-shadow: 0 0 30px rgba(255, 51, 102, 0.3); animation: shake 0.5s forwards;}
+        .anim-wrong h2 { color: var(--danger); }
+        .anim-warning { border-color: var(--danger); box-shadow: 0 0 40px rgba(255, 51, 102, 0.6); animation: shake 0.5s forwards;}
+        .anim-warning h2 { color: var(--danger); }
+
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+    </style>
+</head>
+<body>
+
+    <div id="videoContainer" class="hidden">
+        <video id="webcam" autoplay playsinline></video>
+    </div>
+
+    <!-- Modal Status Jawaban -->
+    <div id="feedbackModal" class="feedback-overlay hidden">
+        <div class="feedback-box" id="feedbackBox">
+            <div class="feedback-icon" id="feedbackIcon">✨</div>
+            <h2 id="feedbackTitle">Status</h2>
+            <p id="feedbackText">Penjelasan jawaban di sini...</p>
+            <button onclick="nextQuestion()">Lanjut >></button>
+        </div>
+    </div>
+
+    <!-- Modal Peringatan Anti Contek -->
+    <div id="cheatModal" class="feedback-overlay hidden">
+        <div class="feedback-box anim-warning">
+            <div class="feedback-icon">🚨</div>
+            <h2>PERINGATAN!</h2>
+            <p id="cheatWarningText" style="color:#ff3366; font-weight:bold;"></p>
+            <button class="btn-danger" onclick="closeCheatModal()">Saya Mengerti</button>
+        </div>
+    </div>
+
+    <div class="container" id="app">
+        
+        <!-- SETUP SCREEN -->
+        <div id="screen-setup">
+            <h1>🎮 Game Dev Quiz</h1>
+            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 25px;">
+                <b>Sistem Keamanan Aktif:</b> Wajib izinkan kamera. Jika berpindah tab 3 kali, ujian langsung dihentikan!
+            </p>
+            
+            <div class="form-group">
+                <label for="playerName">Nama Siswa:</label>
+                <input type="text" id="playerName" placeholder="Masukkan nama lengkap Anda" required autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="playerClass">Pilih Kelas:</label>
+                <select id="playerClass">
+                    <option value="X">Kelas X - Junior</option>
+                    <option value="XI">Kelas XI - Middle</option>
+                    <option value="XII">Kelas XII - Senior</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="gameLevel">Materi (10 Soal):</label>
+                <select id="gameLevel">
+                    <option value="mudah">Mudah (Dasar Engine)</option>
+                    <option value="sedang">Sedang (Logika Scripting)</option>
+                    <option value="sulit">Sulit (Algoritma Lanjut)</option>
+                </select>
+            </div>
+            <button id="btnStart" onclick="requestCameraAndStart()">Mulai Ujian</button>
+            <p id="camError" class="camera-warning hidden">⚠️ Akses kamera ditolak! Harap izinkan kamera di browser.</p>
+        </div>
+
+        <!-- GAMEPLAY SCREEN -->
+        <div id="screen-game" class="hidden">
+            <h2 id="levelTitle">LEVEL</h2>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <p style="color:#94a3b8; font-size: 12px; margin-top:-10px; margin-bottom:20px; text-align:right;">
+                Soal <span id="qIndexDisplay" style="color:white; font-weight:bold;">1</span> dari 10
+            </p>
+
+            <div class="question-box">
+                <span id="questionText">Pertanyaan akan muncul di sini?</span>
+            </div>
+            
+            <div class="options" id="optionsContainer"></div>
+        </div>
+
+        <!-- REPORT SCREEN -->
+        <div id="screen-report" class="hidden">
+            <h1 id="reportMainTitle">🏆 Mission Passed!</h1>
+            
+            <div class="report-card">
+                <p>Nama Siswa <span id="reportName"></span></p>
+                <p>Kelas <span id="reportClass"></span></p>
+                <p>Status Ujian <span id="reportCheatStatus" style="color:var(--primary);">Selesai</span></p>
+                <div class="score-display" id="reportScore">0</div>
+                <p style="text-align:center; font-size:12px; color:#94a3b8; border:none; padding:0; margin:0;">Skor Akhir / 100</p>
+            </div>
+
+            <button class="btn-wa" onclick="shareToWA()">Kirim Skor Ke Pak Muslih</button>
+            <button class="btn-secondary" onclick="restartGame()">Kembali ke Menu</button>
+        </div>
+
+    </div>
+
+    <script>
+        const questionDB = {
+            mudah: [
+                { q: "Software yang digunakan sebagai tempat utama merakit dan membuat game disebut?", options: ["Game Engine", "Web Browser", "Word Processor"], answer: 0, explanation: "Game Engine (seperti Unity, Unreal, Godot) adalah perangkat lunak utama tempat aset, kode, dan suara digabungkan menjadi game." },
+                { q: "Apa sebutan untuk gambar karakter, suara, dan model 3D yang dimasukkan ke dalam game?", options: ["Variabel", "Aset (Assets)", "Syntax"], answer: 1, explanation: "Semua materi visual, audio, dan model yang digunakan di dalam game disebut Aset." },
+                { q: "Dalam grafis game, istilah '2D' merujuk pada objek yang hanya memiliki dimensi...", options: ["Panjang dan Lebar", "Panjang, Lebar, dan Kedalaman", "Hanya Panjang"], answer: 0, explanation: "2D (Dua Dimensi) hanya memiliki sumbu X (Panjang) dan Y (Lebar)." },
+                { q: "Apa tugas utama seorang 'Game Programmer'?", options: ["Menggambar karakter", "Menulis kode logika game", "Membuat musik game"], answer: 1, explanation: "Game programmer bertugas menulis script/kode agar karakter bisa bergerak dan aturan game berjalan semestinya." },
+                { q: "Kesalahan pada kode (error) yang membuat game berjalan tidak semestinya disebut?", options: ["Feature", "Bug", "Lag"], answer: 1, explanation: "Bug adalah istilah untuk cacat atau error pada logika program yang harus diperbaiki." },
+                { q: "Elemen antarmuka seperti tombol Play, bar nyawa (HP), dan skor pada layar disebut?", options: ["UI (User Interface)", "AI (Artificial Intelligence)", "NPC"], answer: 0, explanation: "UI adalah segala sesuatu yang menghubungkan pemain dengan informasi game di layar." },
+                { q: "Karakter dalam game yang tidak dikendalikan oleh pemain melainkan oleh komputer disebut?", options: ["Player", "NPC (Non-Player Character)", "Avatar"], answer: 1, explanation: "NPC dikendalikan oleh script AI untuk berinteraksi dengan pemain utama." },
+                { q: "Singkatan dari FPS yang menentukan seberapa mulus game berjalan adalah?", options: ["First Person Shooter", "Frames Per Second", "Fast Processing System"], answer: 1, explanation: "Dalam konteks performa, FPS (Frames Per Second) adalah jumlah gambar yang dirender per detik." },
+                { q: "Tahap menguji coba game untuk mencari error sebelum game dirilis disebut?", options: ["Publishing", "Playtesting", "Designing"], answer: 1, explanation: "Playtesting adalah tahap krusial dimana game dimainkan untuk mencari bug dan menguji tingkat keseruan." },
+                { q: "Genre game seperti Super Mario atau Sonic dimana pemain melompat antar pijakan disebut?", options: ["RPG", "Platformer", "Shooter"], answer: 1, explanation: "Platformer adalah genre yang mekanik utamanya adalah melompat antar platform/pijakan." }
+            ],
+            sedang: [
+                { q: "Siklus utama game yang terus berjalan mengecek input dan menggerakkan gambar setiap frame disebut?", options: ["Game Loop (Update)", "Game Over", "Start Menu"], answer: 0, explanation: "Game Loop berjalan puluhan kali per detik untuk merender game secara real-time." },
+                { q: "Komponen yang harus dipasang agar karakter game tidak menembus dinding adalah?", options: ["Audio Source", "Collider", "Sprite Renderer"], answer: 1, explanation: "Collider adalah komponen fisika yang memberi batasan padat pada objek agar bisa saling bertabrakan." },
+                { q: "Tipe data yang hanya menyimpan dua nilai, yaitu True (Benar) atau False (Salah) disebut?", options: ["Integer", "String", "Boolean"], answer: 2, explanation: "Boolean sangat cocok untuk status seperti isDead (apakah mati?), isJumping (apakah melompat?)." },
+                { q: "Struktur logika untuk menentukan 'JIKA nyawa pemain 0, MAKA game over' menggunakan?", options: ["For Loop", "If-Else Statement", "Array"], answer: 1, explanation: "If-Else digunakan untuk percabangan logika dan mengambil keputusan berdasarkan kondisi tertentu." },
+                { q: "Untuk menyimpan nilai desimal seperti kecepatan 5.5, tipe data yang digunakan adalah?", options: ["Float", "Integer", "Boolean"], answer: 0, explanation: "Float (Floating point) digunakan untuk angka yang membutuhkan presisi desimal." },
+                { q: "Dalam dunia 3D, sumbu X, Y, dan Z merepresentasikan?", options: ["Merah, Hijau, Biru", "Kanan/Kiri, Atas/Bawah, Maju/Mundur", "Waktu, Kecepatan, Jarak"], answer: 1, explanation: "X (Kanan-Kiri), Y (Atas-Bawah), dan Z (Maju-Mundur/Kedalaman) membentuk ruang 3 Dimensi." },
+                { q: "Objek template yang sudah disetting (misal musuh) dan bisa diduplikat berulang kali di Unity disebut?", options: ["Prefab", "Scene", "Material"], answer: 0, explanation: "Prefab (Pre-fabricated) adalah template objek yang bisa dipanggil (spawn) berkali-kali ke dalam game." },
+                { q: "Istilah untuk men-spawn atau memunculkan objek (seperti peluru) ke dalam game melalui kode adalah?", options: ["Destroy", "Instantiate / Spawn", "Transform"], answer: 1, explanation: "Instantiate adalah perintah untuk menciptakan objek baru di posisi tertentu saat game berjalan." },
+                { q: "Komponen fisika yang memberikan efek gravitasi pada objek disebut?", options: ["Animator", "Rigidbody", "Camera"], answer: 1, explanation: "Rigidbody adalah komponen yang membuat objek tunduk pada hukum fisika engine (jatuh terkena gravitasi)." },
+                { q: "Kumpulan urutan data/nilai dengan tipe yang sama, misal daftar nama senjata pemain, disimpan menggunakan?", options: ["Boolean", "Array / List", "Float"], answer: 1, explanation: "Array atau List digunakan untuk menyimpan banyak data dalam satu variabel yang berurutan." }
+            ],
+            sulit: [
+                { q: "Konsep mengubah posisi secara halus (mulus) dari titik A ke titik B secara persentase disebut?", options: ["Raycasting", "Interpolation (LERP)", "Instantiation"], answer: 1, explanation: "LERP (Linear Interpolation) digunakan untuk membuat pergerakan animasi kamera atau objek menjadi halus/smooth." },
+                { q: "Pola kode (Design Pattern) yang memastikan hanya ada SATU instance dari sebuah GameManager adalah?", options: ["Singleton", "Observer", "Factory"], answer: 0, explanation: "Singleton memastikan bahwa class tersebut hanya dibuat satu kali dan bisa diakses secara global oleh script lain." },
+                { q: "Algoritma kecerdasan buatan (AI) yang paling umum digunakan musuh untuk mencari jalan terpendek adalah?", options: ["Bubble Sort", "A* (A-Star) Pathfinding", "Binary Search"], answer: 1, explanation: "A-Star mencari rute paling efisien menghindari rintangan (obstacle) menuju target." },
+                { q: "Menembakkan garis laser tak terlihat dari senjata untuk mendeteksi apakah mengenai musuh disebut?", options: ["Raycasting", "Pathfinding", "Rendering"], answer: 0, explanation: "Raycasting sering digunakan di game FPS modern untuk mendeteksi tembakan instan." },
+                { q: "Agar game tidak berat (lag) karena terus-menerus membuat dan menghancurkan peluru, teknik yang dipakai adalah?", options: ["Garbage Collection", "Object Pooling", "Multithreading"], answer: 1, explanation: "Object pooling mendaur ulang objek (peluru yang sudah hancur disembunyikan dan dipakai lagi nanti) untuk menghemat memori." },
+                { q: "Agar pergerakan pemain tetap sama meski dimainkan di HP lambat atau PC cepat, kecepatan dikalikan dengan?", options: ["Delta Time", "Fixed Update", "Frame Rate"], answer: 0, explanation: "Time.deltaTime meratakan pergerakan agar bergantung pada detik nyata (waktu), bukan pada seberapa cepat frame (FPS) dirender." },
+                { q: "Sistem desain logika AI dimana bos musuh berpindah dari status 'Patroli', ke 'Mengejar', ke 'Menyerang' disebut?", options: ["MVC Pattern", "FSM (Finite State Machine)", "Recursion"], answer: 1, explanation: "FSM membagi perilaku musuh menjadi 'State' (kondisi) yang aktif bergantian secara spesifik." },
+                { q: "Proses engine menghapus memori dari objek yang sudah tidak terpakai secara otomatis disebut?", options: ["Garbage Collection (GC)", "Memory Leak", "Overriding"], answer: 0, explanation: "GC bekerja membersihkan RAM dari data yang tidak terpakai." },
+                { q: "Fungsi yang bisa menghentikan sementara jalannya sebuah blok kode (misal: tunggu 3 detik lalu hancur) di Unity disebut?", options: ["Coroutine", "Void Update", "Constructor"], answer: 0, explanation: "Coroutine memungkinkan eksekusi kode yang ditunda atau dijalankan bertahap melintasi beberapa frame." },
+                { q: "Perangkat lunak untuk kolaborasi tim dan menyimpan histori perubahan kode (seperti GitHub) menggunakan sistem?", options: ["Version Control System (Git)", "Database SQL", "Cloud Rendering"], answer: 0, explanation: "Git digunakan programmer untuk bekerja bersama tanpa menimpa kode satu sama lain dan melacak setiap perubahan." }
+            ]
+        };
+
+        let player = { name: "", class: "", level: "", score: 0 };
+        let currentQuestions = [];
+        let currentQIndex = 0;
+        let stream = null; 
+        
+        // Anti Cheat System Variables
+        let isPlaying = false;
+        let cheatCount = 0;
+
+        function showScreen(screenId) {
+            document.getElementById('screen-setup').classList.add('hidden');
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-report').classList.add('hidden');
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        async function requestCameraAndStart() {
+            const name = document.getElementById('playerName').value.trim();
+            if(!name) return alert("Harap masukkan Nama Siswa Anda!");
+            
+            const btn = document.getElementById('btnStart');
+            btn.innerText = "MENGAKSES KAMERA...";
+            btn.disabled = true;
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                document.getElementById('webcam').srcObject = stream;
+                document.getElementById('videoContainer').classList.remove('hidden');
+                document.getElementById('camError').classList.add('hidden');
+                setupGame(name);
+            } catch (err) {
+                document.getElementById('camError').classList.remove('hidden');
+                btn.innerText = "MULAI UJIAN";
+                btn.disabled = false;
+            }
+        }
+
+        function setupGame(name) {
+            player.name = name;
+            player.class = document.getElementById('playerClass').value;
+            player.level = document.getElementById('gameLevel').value;
+            player.score = 0;
+
+            currentQuestions = questionDB[player.level];
+            currentQIndex = 0;
+            
+            // Reset Anti Cheat
+            cheatCount = 0;
+            isPlaying = true;
+            document.getElementById('reportCheatStatus').innerText = "Bersih / Normal";
+            document.getElementById('reportCheatStatus').style.color = "var(--success)";
+            document.getElementById('reportMainTitle').innerText = "🏆 Mission Passed!";
+
+            document.getElementById('levelTitle').innerText = "Materi: " + player.level.toUpperCase();
+            loadQuestion();
+            showScreen('screen-game');
+        }
+
+        // SISTEM ANTI CONTEK (Deteksi Pindah Tab)
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden && isPlaying) {
+                triggerAntiCheat();
+            }
+        });
+
+        function triggerAntiCheat() {
+            cheatCount++;
+            if (cheatCount >= 3) {
+                // Hukuman Berat - Ujian Selesai Paksa
+                alert("🚨 PELANGGARAN FATAL! Anda telah berpindah tab 3 kali. Ujian dihentikan paksa!");
+                document.getElementById('cheatModal').classList.add('hidden');
+                document.getElementById('feedbackModal').classList.add('hidden');
+                
+                document.getElementById('reportCheatStatus').innerText = "TERINDIKASI MENCONTEK (Force Quit)";
+                document.getElementById('reportCheatStatus').style.color = "var(--danger)";
+                document.getElementById('reportMainTitle').innerText = "❌ MISSION FAILED";
+                
+                finishGame(); // Langsung akhiri game dengan skor seadanya
+            } else {
+                // Peringatan Biasa
+                document.getElementById('cheatWarningText').innerText = `Anda terdeteksi meninggalkan halaman ujian atau membuka tab lain!\n\nPelanggaran: ${cheatCount} / 3\n\nJika mencapai 3 kali, ujian akan otomatis dihentikan!`;
+                document.getElementById('cheatModal').classList.remove('hidden');
+            }
+        }
+
+        function closeCheatModal() {
+            document.getElementById('cheatModal').classList.add('hidden');
+        }
+
+        function loadQuestion() {
+            const qData = currentQuestions[currentQIndex];
+            document.getElementById('questionText').innerText = qData.q;
+            document.getElementById('qIndexDisplay').innerText = (currentQIndex + 1);
+            
+            const progress = ((currentQIndex) / 10) * 100;
+            document.getElementById('progressBar').style.width = progress + "%";
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = ""; 
+
+            qData.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn";
+                btn.innerText = opt;
+                btn.onclick = () => processAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function processAnswer(selectedIndex) {
+            const qData = currentQuestions[currentQIndex];
+            const isCorrect = (selectedIndex === qData.answer);
+            if (isCorrect) player.score += 10;
+            showFeedback(isCorrect, qData.explanation);
+        }
+
+        function showFeedback(isCorrect, explanation) {
+            const modal = document.getElementById('feedbackModal');
+            const box = document.getElementById('feedbackBox');
+            const icon = document.getElementById('feedbackIcon');
+            const title = document.getElementById('feedbackTitle');
+            const text = document.getElementById('feedbackText');
+
+            modal.classList.remove('hidden');
+            box.className = "feedback-box"; 
+            void box.offsetWidth; 
+
+            if(isCorrect) {
+                box.classList.add('anim-correct');
+                icon.innerText = "✅";
+                title.innerText = "BENAR!";
+            } else {
+                box.classList.add('anim-wrong');
+                icon.innerText = "❌";
+                title.innerText = "KURANG TEPAT!";
+            }
+            text.innerText = explanation;
+        }
+
+        function nextQuestion() {
+            document.getElementById('feedbackModal').classList.add('hidden');
+            currentQIndex++;
+            if (currentQIndex < currentQuestions.length) {
+                loadQuestion();
+            } else {
+                document.getElementById('progressBar').style.width = "100%";
+                setTimeout(finishGame, 500);
+            }
+        }
+
+        function finishGame() {
+            isPlaying = false; // Matikan deteksi anti-contek
+            stopCamera();
+            document.getElementById('videoContainer').classList.add('hidden');
+
+            document.getElementById('reportName').innerText = player.name;
+            document.getElementById('reportClass').innerText = "Kelas " + player.class;
+            
+            let displayScore = 0;
+            const scoreEl = document.getElementById('reportScore');
+            const interval = setInterval(() => {
+                if(displayScore >= player.score) {
+                    clearInterval(interval);
+                    scoreEl.innerText = player.score;
+                } else {
+                    displayScore += 2;
+                    scoreEl.innerText = displayScore;
+                }
+            }, 30);
+            
+            showScreen('screen-report');
+        }
+
+        function shareToWA() {
+            const phoneNumber = "62895361526648";
+            let statusContek = cheatCount >= 3 ? "*TERINDIKASI MENCONTEK (Force Quit)*" : "*Aman*";
+            const text = `Halo Pak Muslih, saya *${player.name}* dari *Kelas ${player.class}*.\n\nSaya telah mengerjakan Ujian Game Dev materi *${player.level.toUpperCase()}*.\n\nSkor Akhir: *${player.score}/100*\nStatus Ujian: ${statusContek}\n\nTerima kasih Pak.`;
+            const encodedText = encodeURIComponent(text);
+            window.open(`https://wa.me/${phoneNumber}?text=${encodedText}`, '_blank');
+        }
+
+        function restartGame() {
+            document.getElementById('playerName').value = "";
+            document.getElementById('btnStart').innerText = "MULAI UJIAN";
+            document.getElementById('btnStart').disabled = false;
+            document.getElementById('progressBar').style.width = "0%";
+            showScreen('screen-setup');
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        }
+    </script>
+</body>
+</html>
